@@ -94,7 +94,7 @@ uuid = { version = "1.1.2", features = ["v1"] }
 
 # mmap
 [target.'cfg(all(unix, not(target_arch = "wasm32")))'.dependencies]
-memmap2 = { git = "https://github.com/sinkingsugar/memmap2-rs.git", rev = "5a30f6b79683446e3851263fac15e30301df16b6" }
+memmap2 = { git = "https://github.com/sinkingsugar/memmap2-rs.git", rev = "d0cbc3362908617fd6adcac8d84dddbbee91d4c0" }
 page_size = "0.6"
 
 [target.'cfg(all(unix, not(target_os = "redox"), not(target_os = "ios"), not(target_os = "visionos")))'.dependencies]
