@@ -1458,9 +1458,8 @@ checksum = "f52b00d39961fc5b2736ea853c9cc86238e165017a493d1d5c8eac6bdc4cc273"
 
 [[package]]
 name = "memmap2"
-version = "0.5.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "83faa42c0a078c393f6b29d5db232d8be22776a891f8f56e5284faee4a20b327"
+version = "0.9.8"
+source = "git+https://github.com/sinkingsugar/memmap2-rs.git?rev=5a30f6b79683446e3851263fac15e30301df16b6#5a30f6b79683446e3851263fac15e30301df16b6"
 dependencies = [
  "libc",
 ]

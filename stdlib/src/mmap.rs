@@ -22,7 +22,7 @@ mod mmap {
         types::{AsBuffer, AsMapping, AsSequence, Constructor, Representable},
     };
     use crossbeam_utils::atomic::AtomicCell;
-    use memmap2::{Advice, Mmap, MmapMut, MmapOptions};
+    use memmap2::{Advice, UncheckedAdvice, Mmap, MmapMut, MmapOptions};
     #[cfg(unix)]
     use nix::sys::stat::fstat;
     use nix::unistd;
@@ -31,35 +31,46 @@ mod mmap {
     use std::io::{self, Write};
     use std::ops::{Deref, DerefMut};
 
-    fn advice_try_from_i32(vm: &VirtualMachine, i: i32) -> PyResult<Advice> {
+    enum AdviceWrapper {
+        Safe(Advice),
+        Unchecked(UncheckedAdvice),
+    }
+
+    fn advice_try_from_i32(vm: &VirtualMachine, i: i32) -> PyResult<AdviceWrapper> {
         Ok(match i {
-            libc::MADV_NORMAL => Advice::Normal,
-            libc::MADV_RANDOM => Advice::Random,
-            libc::MADV_SEQUENTIAL => Advice::Sequential,
-            libc::MADV_WILLNEED => Advice::WillNeed,
-            libc::MADV_DONTNEED => Advice::DontNeed,
+            libc::MADV_NORMAL => AdviceWrapper::Safe(Advice::Normal),
+            libc::MADV_RANDOM => AdviceWrapper::Safe(Advice::Random),
+            libc::MADV_SEQUENTIAL => AdviceWrapper::Safe(Advice::Sequential),
+            libc::MADV_WILLNEED => AdviceWrapper::Safe(Advice::WillNeed),
+            libc::MADV_DONTNEED => AdviceWrapper::Unchecked(UncheckedAdvice::DontNeed),
             #[cfg(any(target_os = "linux", target_os = "macos", target_os = "ios", target_os = "visionos"))]
-            libc::MADV_FREE => Advice::Free,
+            libc::MADV_FREE => AdviceWrapper::Unchecked(UncheckedAdvice::Free),
             #[cfg(target_os = "linux")]
-            libc::MADV_DONTFORK => Advice::DontFork,
+            libc::MADV_DONTFORK => AdviceWrapper::Safe(Advice::DontFork),
             #[cfg(target_os = "linux")]
-            libc::MADV_DOFORK => Advice::DoFork,
+            libc::MADV_DOFORK => AdviceWrapper::Safe(Advice::DoFork),
             #[cfg(target_os = "linux")]
-            libc::MADV_MERGEABLE => Advice::Mergeable,
+            libc::MADV_MERGEABLE => AdviceWrapper::Safe(Advice::Mergeable),
             #[cfg(target_os = "linux")]
-            libc::MADV_UNMERGEABLE => Advice::Unmergeable,
+            libc::MADV_UNMERGEABLE => AdviceWrapper::Safe(Advice::Unmergeable),
             #[cfg(target_os = "linux")]
-            libc::MADV_HUGEPAGE => Advice::HugePage,
+            libc::MADV_HUGEPAGE => AdviceWrapper::Safe(Advice::HugePage),
             #[cfg(target_os = "linux")]
-            libc::MADV_NOHUGEPAGE => Advice::NoHugePage,
+            libc::MADV_NOHUGEPAGE => AdviceWrapper::Safe(Advice::NoHugePage),
             #[cfg(target_os = "linux")]
-            libc::MADV_REMOVE => Advice::Remove,
+            libc::MADV_REMOVE => AdviceWrapper::Unchecked(UncheckedAdvice::Remove),
             #[cfg(target_os = "linux")]
-            libc::MADV_DONTDUMP => Advice::DontDump,
+            libc::MADV_DONTDUMP => AdviceWrapper::Safe(Advice::DontDump),
             #[cfg(target_os = "linux")]
-            libc::MADV_DODUMP => Advice::DoDump,
+            libc::MADV_DODUMP => AdviceWrapper::Safe(Advice::DoDump),
             #[cfg(target_os = "linux")]
-            libc::MADV_HWPOISON => Advice::HwPoison,
+            libc::MADV_HWPOISON => AdviceWrapper::Safe(Advice::HwPoison),
+            #[cfg(target_os = "linux")]
+            libc::MADV_POPULATE_READ => AdviceWrapper::Safe(Advice::PopulateRead),
+            #[cfg(target_os = "linux")]
+            libc::MADV_POPULATE_WRITE => AdviceWrapper::Safe(Advice::PopulateWrite),
+            #[cfg(any(target_os = "macos", target_os = "ios", target_os = "visionos"))]
+            libc::MADV_ZERO_WIRED_PAGES => AdviceWrapper::Safe(Advice::ZeroWiredPages),
             _ => return Err(vm.new_value_error("Not a valid Advice value")),
         })
     }
@@ -650,11 +661,17 @@ mod mmap {
             let advice = advice_try_from_i32(vm, option)?;
 
             //TODO: memmap2 doesn't support madvise range right now.
-            match self.check_valid(vm)?.deref().as_ref().unwrap() {
-                MmapObj::Read(mmap) => mmap.advise(advice),
-                MmapObj::Write(mmap) => mmap.advise(advice),
-            }
-            .map_err(|e| e.to_pyexception(vm))?;
+            let result = match advice {
+                AdviceWrapper::Safe(adv) => match self.check_valid(vm)?.deref().as_ref().unwrap() {
+                    MmapObj::Read(mmap) => mmap.advise(adv),
+                    MmapObj::Write(mmap) => mmap.advise(adv),
+                },
+                AdviceWrapper::Unchecked(adv) => match self.check_valid(vm)?.deref().as_ref().unwrap() {
+                    MmapObj::Read(mmap) => unsafe { mmap.unchecked_advise(adv) },
+                    MmapObj::Write(mmap) => unsafe { mmap.unchecked_advise(adv) },
+                },
+            };
+            result.map_err(|e| e.to_pyexception(vm))?;
 
             Ok(())
         }
