@@ -18,7 +18,7 @@ mod gc;
 
 mod bz2;
 mod compression; // internal module
-#[cfg(not(any(target_os = "android", target_arch = "wasm32")))]
+#[cfg(all(feature = "lzma", not(any(target_os = "android", target_arch = "wasm32"))))]
 mod lzma;
 mod zlib;
 
@@ -159,7 +159,7 @@ pub fn get_module_inits() -> impl Iterator<Item = (Cow<'static, str>, StdlibInit
             "_multiprocessing" => multiprocessing::make_module,
             "_socket" => socket::make_module,
         }
-        #[cfg(not(any(target_os = "android", target_arch = "wasm32")))]
+        #[cfg(all(feature = "lzma", not(any(target_os = "android", target_arch = "wasm32"))))]
         {
             "_lzma" => lzma::make_module,
         }

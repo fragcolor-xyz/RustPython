@@ -18,6 +18,7 @@ sqlite = ["dep:libsqlite3-sys"]
 ssl = ["openssl", "openssl-sys", "foreign-types-shared", "openssl-probe"]
 ssl-vendor = ["ssl", "openssl/vendored"]
 tkinter = ["dep:tk-sys", "dep:tcl-sys"]
+lzma = ["dep:lzma-sys", "dep:xz2"]
 
 [dependencies]
 # rustpython crates
@@ -113,8 +114,8 @@ foreign-types-shared = { version = "0.1.1", optional = true }
 
 [target.'cfg(not(any(target_os = "android", target_arch = "wasm32")))'.dependencies]
 libsqlite3-sys = { version = "0.28", features = ["bundled"], optional = true }
-lzma-sys = "0.1"
-xz2 = "0.1"
+lzma-sys = { version = "0.1", optional = true }
+xz2 = { version = "0.1", optional = true }
 
 [target.'cfg(windows)'.dependencies]
 paste = { workspace = true }

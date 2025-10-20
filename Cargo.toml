@@ -10,7 +10,7 @@ repository.workspace = true
 license.workspace = true
 
 [features]
-default = ["threading", "stdlib", "stdio", "importlib"]
+default = ["threading", "stdlib", "stdio", "importlib", "ctypes"]
 importlib = ["rustpython-vm/importlib"]
 encodings = ["rustpython-vm/encodings"]
 stdio = ["rustpython-vm/stdio"]
@@ -18,11 +18,13 @@ stdlib = ["rustpython-stdlib", "rustpython-pylib", "encodings"]
 flame-it = ["rustpython-vm/flame-it", "flame", "flamescope"]
 freeze-stdlib = ["stdlib", "rustpython-vm/freeze-stdlib", "rustpython-pylib?/freeze-stdlib"]
 jit = ["rustpython-vm/jit"]
+ctypes = ["rustpython-vm/ctypes"]
 threading = ["rustpython-vm/threading", "rustpython-stdlib/threading"]
 sqlite = ["rustpython-stdlib/sqlite"]
 ssl = ["rustpython-stdlib/ssl"]
 ssl-vendor = ["ssl", "rustpython-stdlib/ssl-vendor"]
 tkinter = ["rustpython-stdlib/tkinter"]
+lzma = ["rustpython-stdlib/lzma"]
 
 [build-dependencies]
 winresource = "0.1"

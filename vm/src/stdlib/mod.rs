@@ -41,6 +41,7 @@ pub mod posix;
 pub mod posix;
 
 #[cfg(all(
+    feature = "ctypes",
     any(target_os = "linux", target_os = "macos", target_os = "windows"),
     not(any(target_env = "musl", target_env = "sgx"))
 ))]
@@ -143,6 +144,7 @@ pub fn get_module_inits() -> StdlibMap {
             "winreg" => winreg::make_module,
         }
         #[cfg(all(
+            feature = "ctypes",
             any(target_os = "linux", target_os = "macos", target_os = "windows"),
             not(any(target_env = "musl", target_env = "sgx"))
         ))]
