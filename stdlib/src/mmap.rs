@@ -38,7 +38,7 @@ mod mmap {
             libc::MADV_SEQUENTIAL => Advice::Sequential,
             libc::MADV_WILLNEED => Advice::WillNeed,
             libc::MADV_DONTNEED => Advice::DontNeed,
-            #[cfg(any(target_os = "linux", target_os = "macos", target_os = "ios"))]
+            #[cfg(any(target_os = "linux", target_os = "macos", target_os = "ios", target_os = "visionos"))]
             libc::MADV_FREE => Advice::Free,
             #[cfg(target_os = "linux")]
             libc::MADV_DONTFORK => Advice::DontFork,

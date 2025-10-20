@@ -51,7 +51,7 @@ pub(crate) mod msvcrt;
 
 #[cfg(all(
     unix,
-    not(any(target_os = "ios", target_os = "wasi", target_os = "redox"))
+    not(any(target_os = "ios", target_os = "visionos", target_os = "wasi", target_os = "redox"))
 ))]
 mod pwd;
 
@@ -130,7 +130,7 @@ pub fn get_module_inits() -> StdlibMap {
         // Unix-only
         #[cfg(all(
             unix,
-            not(any(target_os = "ios", target_os = "wasi", target_os = "redox"))
+            not(any(target_os = "ios", target_os = "visionos", target_os = "wasi", target_os = "redox"))
         ))]
         {
             "pwd" => pwd::make_module,

@@ -32,7 +32,7 @@ mod sha512;
 
 mod json;
 
-#[cfg(not(any(target_os = "ios", target_arch = "wasm32")))]
+#[cfg(not(any(target_os = "ios", target_os = "visionos", target_arch = "wasm32")))]
 mod locale;
 
 mod math;
@@ -77,11 +77,12 @@ mod select;
 mod sqlite;
 #[cfg(all(not(target_arch = "wasm32"), feature = "ssl"))]
 mod ssl;
-#[cfg(all(unix, not(target_os = "redox"), not(target_os = "ios")))]
+#[cfg(all(unix, not(target_os = "redox"), not(target_os = "ios"), not(target_os = "visionos")))]
 mod termios;
 #[cfg(not(any(
     target_os = "android",
     target_os = "ios",
+    target_os = "visionos",
     target_os = "windows",
     target_arch = "wasm32",
     target_os = "redox",
@@ -186,7 +187,7 @@ pub fn get_module_inits() -> impl Iterator<Item = (Cow<'static, str>, StdlibInit
             "syslog" => syslog::make_module,
             "resource" => resource::make_module,
         }
-        #[cfg(all(unix, not(any(target_os = "ios", target_os = "redox"))))]
+        #[cfg(all(unix, not(any(target_os = "ios", target_os = "visionos", target_os = "redox"))))]
         {
             "termios" => termios::make_module,
         }
@@ -198,11 +199,11 @@ pub fn get_module_inits() -> impl Iterator<Item = (Cow<'static, str>, StdlibInit
         {
             "_scproxy" => scproxy::make_module,
         }
-        #[cfg(not(any(target_os = "android", target_os = "ios", target_os = "windows", target_arch = "wasm32", target_os = "redox")))]
+        #[cfg(not(any(target_os = "android", target_os = "ios", target_os = "visionos", target_os = "windows", target_arch = "wasm32", target_os = "redox")))]
         {
             "_uuid" => uuid::make_module,
         }
-        #[cfg(not(any(target_os = "ios", target_arch = "wasm32")))]
+        #[cfg(not(any(target_os = "ios", target_os = "visionos", target_arch = "wasm32")))]
         {
             "_locale" => locale::make_module,
         }

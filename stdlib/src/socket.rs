@@ -2158,6 +2158,7 @@ mod _socket {
         target_os = "freebsd",
         target_os = "fuchsia",
         target_os = "ios",
+        target_os = "visionos",
         target_os = "linux",
         target_os = "macos",
         target_os = "netbsd",

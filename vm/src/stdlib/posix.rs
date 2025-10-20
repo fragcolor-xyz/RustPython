@@ -359,7 +359,7 @@ pub mod module {
         }
     }
 
-    #[cfg(any(target_os = "macos", target_os = "ios"))]
+    #[cfg(any(target_os = "macos", target_os = "ios", target_os = "visionos"))]
     fn getgroups_impl() -> nix::Result<Vec<Gid>> {
         use libc::{c_int, gid_t};
         use nix::errno::Errno;
@@ -379,7 +379,7 @@ pub mod module {
         })
     }
 
-    #[cfg(not(any(target_os = "macos", target_os = "ios", target_os = "redox")))]
+    #[cfg(not(any(target_os = "macos", target_os = "ios", target_os = "visionos", target_os = "redox")))]
     use nix::unistd::getgroups as getgroups_impl;
 
     #[cfg(target_os = "redox")]
@@ -1406,7 +1406,7 @@ pub mod module {
     }
 
     // cfg from nix
-    #[cfg(not(any(target_os = "ios", target_os = "macos", target_os = "redox")))]
+    #[cfg(not(any(target_os = "ios", target_os = "visionos", target_os = "macos", target_os = "redox")))]
     #[pyfunction]
     fn setgroups(
         group_ids: crate::function::ArgIterable<Gid>,

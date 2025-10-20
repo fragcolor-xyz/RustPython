@@ -331,7 +331,7 @@ fn exec_inner(
     }
 
     if let Some(_groups) = procargs.extra_groups {
-        #[cfg(not(any(target_os = "ios", target_os = "macos", target_os = "redox")))]
+        #[cfg(not(any(target_os = "ios", target_os = "visionos", target_os = "macos", target_os = "redox")))]
         unistd::setgroups(_groups)?;
     }
 

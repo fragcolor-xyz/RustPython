@@ -54,7 +54,7 @@ mod _locale {
 
     #[cfg(all(
         unix,
-        not(any(target_os = "ios", target_os = "android", target_os = "redox"))
+        not(any(target_os = "ios", target_os = "visionos", target_os = "android", target_os = "redox"))
     ))]
     #[pyattr]
     use libc::{
@@ -66,7 +66,7 @@ mod _locale {
         T_FMT_AMPM, THOUSEP, YESEXPR,
     };
 
-    #[cfg(all(unix, not(any(target_os = "ios", target_os = "redox"))))]
+    #[cfg(all(unix, not(any(target_os = "ios", target_os = "visionos", target_os = "redox"))))]
     #[pyattr]
     use libc::LC_MESSAGES;
 
